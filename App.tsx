@@ -12,9 +12,10 @@ import {
 } from 'react-native-paper';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Login from './src/login';
-import SignIn from './src/signIn';
+import Login from './src/routes/Login';
+import SignIn from './src/routes/SignIn';
 import { registerRootComponent } from 'expo';
+import ForgotPassword from './src/routes/ForgotPassword';
 SplashScreen.preventAutoHideAsync();
 
 export const theme = {
@@ -67,7 +68,6 @@ export default function App() {
     Roboto_400Regular,
   });
 
-  const appTheme = useTheme();
   const Stack = createStackNavigator();
 
   const onLayoutRootView = useCallback(async () => {
@@ -98,6 +98,7 @@ export default function App() {
           >
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="SignIn" component={SignIn} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           </Stack.Navigator>
         </NavigationContainer>
         <StatusBar style="light" translucent backgroundColor="#200c10" />

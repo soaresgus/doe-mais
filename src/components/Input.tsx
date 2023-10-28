@@ -10,7 +10,7 @@ export function Input(props: InputProps) {
 
   return (
     <TextInput
-      className={clsx('w-80 h-auto rounded-t-md', props.extendedClasses)}
+      className={clsx('h-auto rounded-t-md', props.extendedClasses)}
       underlineColor={appTheme.colors.primary}
       activeOutlineColor={appTheme.colors.primary}
       activeUnderlineColor={appTheme.colors.primary}
