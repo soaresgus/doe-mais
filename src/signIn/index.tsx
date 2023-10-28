@@ -6,14 +6,15 @@ import {
   RadioButton,
   useTheme,
 } from 'react-native-paper';
-import { Input } from '../../src/components/Input';
+
+import { Input } from '../components/Input';
 import logoSrc from '../../assets/logo.png';
 import { StatusBar } from 'expo-status-bar';
-import { BloodTypes } from '../../src/types/BloodTypes';
-import { Radio } from '../../src/components/Radio';
-import { theme } from '..';
+import { BloodTypes } from '../types/BloodTypes';
+import { Radio } from '../components/Radio';
+import { theme } from '../_layout';
 
-function Component() {
+const SignIn = () => {
   const [name, setName] = useState<string>();
   const [bloodType, setBloodType] = useState<BloodTypes>(BloodTypes.A_POSITIVO);
   const [email, setEmail] = useState<string>('');
@@ -64,24 +65,13 @@ function Component() {
             <Radio label="O-" value={BloodTypes.O_NEGATIVO} />
           </View>
         </RadioButton.Group>
-        <Button
-          className="w-80"
-          mode="outlined"
-          loading={isLoading}
-          textColor={appTheme.colors.primary}
-        >
+        <Button className="w-80" mode="outlined" loading={isLoading}>
           {!isLoading && 'ENTRAR'}
         </Button>
       </ScrollView>
       <StatusBar style="light" translucent backgroundColor="#200c10" />
     </View>
   );
-}
+};
 
-export default function SignIn() {
-  return (
-    <PaperProvider theme={theme}>
-      <Component />
-    </PaperProvider>
-  );
-}
+export default SignIn;

@@ -1,9 +1,8 @@
 {
   "expo": {
-    "name": "Doe+",
-    "slug": "Doe+",
-    "scheme": "doe-mais",
-    "version": "0.0.1",
+    "name": "doe-mais",
+    "slug": "doe-mais",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -25,11 +24,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png",
-      "bundler": "metro"
-    },
-    "plugins": [
-      "expo-router"
-    ]
+      "favicon": "./assets/favicon.png"
+    }
   }
 }
