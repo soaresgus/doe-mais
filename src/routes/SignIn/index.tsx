@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Image,
   ScrollView,
@@ -6,6 +6,9 @@ import {
   Text,
   TouchableHighlight,
   View,
+  Keyboard,
+  Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import {
   ActivityIndicator,
@@ -14,6 +17,7 @@ import {
   RadioButton,
   useTheme,
 } from 'react-native-paper';
+import { Picker } from '@react-native-picker/picker';
 
 import { Input } from '../../components/Input';
 import logoSrc from '../../../assets/logo.png';
@@ -22,46 +26,33 @@ import { BloodTypes } from '../../types/BloodTypes';
 import { Radio } from '../../components/Radio';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { string, z } from 'zod';
 import { Link } from '@react-navigation/native';
 import cep from 'cep-promise';
 import { useMaskedInputProps } from 'react-native-mask-input';
 import states from '../../models/states.json';
-import ModalDropdown from 'react-native-modal-dropdown';
+import Carousel from 'react-native-snap-carousel';
 
-const statesAcronyms = states.estados.map((item) => item.sigla);
+import figura1 from '../../../assets/figures/person-1.png';
+import figura2 from '../../../assets/figures/person-2.png';
+import figura3 from '../../../assets/figures/person-3.png';
+import figura4 from '../../../assets/figures/person-4.png';
+import figura5 from '../../../assets/figures/person-5.png';
+import figura6 from '../../../assets/figures/person-6.png';
+import figura7 from '../../../assets/figures/person-7.png';
+import figura8 from '../../../assets/figures/person-8.png';
+import figura9 from '../../../assets/figures/person-9.png';
+import figura10 from '../../../assets/figures/person-10.png';
+import figura11 from '../../../assets/figures/person-11.png';
+import figura12 from '../../../assets/figures/person-12.png';
+import figura13 from '../../../assets/figures/person-13.png';
+import figura14 from '../../../assets/figures/person-14.png';
+import figura15 from '../../../assets/figures/person-15.png';
+import figura16 from './';
 
-const dropdownRenderRow = (rowData: any, rowID: any, highlighted: any) => {
-  let evenRow = rowID % 2;
-  return (
-    <TouchableHighlight underlayColor="cornflowerblue">
-      <View
-        style={[
-          styles.dropdown_row,
-          { backgroundColor: evenRow ? 'lemonchiffon' : 'white' },
-        ]}
-      >
-        <Text
-          style={[
-            styles.dropdown_row_text,
-            highlighted && { color: 'mediumaquamarine' },
-          ]}
-        >
-          {`${rowData.name} (${rowData.age})`}
-        </Text>
-      </View>
-    </TouchableHighlight>
-  );
-};
-
-const dropdownRenderSeparator = (
-  sectionID: any,
-  rowID: any,
-  adjacentRowHighlighted: any
-) => {
-  let key = `spr_${rowID}`;
-  return <View style={styles.dropdown_separator} key={key} />;
-};
+const statesAcronyms = states.estados.map((item) => {
+  return { acronym: item.sigla, state: item.nome, city: item.cidades };
+});
 
 const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -88,6 +79,7 @@ const SignIn = () => {
     control,
     handleSubmit,
     formState: { errors },
+    watch,
     getValues,
     setValue,
   } = useForm({
@@ -102,11 +94,13 @@ const SignIn = () => {
       neighborhood: '',
       city: '',
       number: '',
+      state: '',
     },
   });
 
   const [cepState, setCepState] = useState('');
-  const [state, setState] = useState('');
+  const [citiesItems, setCitiesItems] = useState<string[]>([]);
+  const [image, setImage] = useState();
 
   const appTheme = useTheme();
 
@@ -116,7 +110,7 @@ const SignIn = () => {
 
     setValue('street', result.street);
     setValue('city', result.city);
-    setState(result.state);
+    setValue('state', result.state);
     setValue('neighborhood', result.neighborhood);
 
     setIsLoadingCep(false);
@@ -126,6 +120,7 @@ const SignIn = () => {
     setCepState(cepValue);
     if (cepValue.length >= 9) {
       await fetchCep(cepValue);
+      Keyboard.dismiss();
     }
   };
 
@@ -145,12 +140,131 @@ const SignIn = () => {
     console.log(data);
   };
 
+  const width = Dimensions.get('window').width;
+
+  const figures = [
+    {
+      id: '1',
+      figura: figura1,
+      src: '../../../assets/figures/person-1.png',
+    },
+    {
+      id: '2',
+      figura: figura2,
+      src: '../../../assets/figures/person-2.png',
+    },
+    {
+      id: '3',
+      figura: figura3,
+      src: '../../../assets/figures/person-3.png',
+    },
+    {
+      id: '4',
+      figura: figura4,
+      src: '../../../assets/figures/person-4.png',
+    },
+    {
+      id: '5',
+      figura: figura5,
+      src: '../../../assets/figures/person-5.png',
+    },
+    {
+      id: '6',
+      figura: figura6,
+      src: '../../../assets/figures/person-6.png',
+    },
+    {
+      id: '7',
+      figura: figura7,
+      src: '../../../assets/figures/person-7.png',
+    },
+    {
+      id: '8',
+      figura: figura8,
+      src: '../../../assets/figures/person-8.png',
+    },
+    {
+      id: '9',
+      figura: figura9,
+      src: '../../../assets/figures/person-9.png',
+    },
+    {
+      id: '10',
+      figura: figura10,
+      src: '../../../assets/figures/person-10.png',
+    },
+    {
+      id: '11',
+      figura: figura11,
+      src: '../../../assets/figures/person-11.png',
+    },
+    {
+      id: '12',
+      figura: figura12,
+      src: '../../../assets/figures/person-12.png',
+    },
+    {
+      id: '13',
+      figura: figura13,
+      src: '../../../assets/figures/person-13.png',
+    },
+    {
+      id: '14',
+      figura: figura14,
+      src: '../../../assets/figures/person-14.png',
+    },
+    {
+      id: '15',
+      figura: figura15,
+      src: '../../../assets/figures/person-15.png',
+    },
+    {
+      id: '16',
+      figura: figura16,
+      src: './',
+    },
+  ];
+
+  const changeAvatarImage = (index: number) => {
+    const figurePath = figures[index].src;
+
+    console.log(figurePath.replace('../../../assets/figures', ''));
+  };
+
+  const carouselItem = ({ item, index }: { item: any; index: number }) => {
+    return (
+      <View>
+        <Image
+          source={figures[index].figura}
+          className="w-full h-full"
+          resizeMode="contain"
+        />
+      </View>
+    );
+  };
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name === 'state') {
+        const stateValue = value.state;
+        if (stateValue) {
+          const cities = statesAcronyms.filter(
+            (item) => item.acronym === stateValue
+          )[0].city;
+          setCitiesItems(cities);
+          return;
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   return (
     <ScrollView
       contentContainerStyle={{
         width: '100%',
         paddingTop: 80,
-        paddingBottom: 40,
+        paddingBottom: 120,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#200c10',
@@ -366,7 +480,12 @@ const SignIn = () => {
         </View>
 
         <View className="flex-row mr-8 gap-4 items-center justify-center">
-          <Input label="CEP" extendedClasses="w-60" {...cepMaskedInputProps} />
+          <Input
+            label="CEP"
+            extendedClasses="w-60"
+            keyboardType="numeric"
+            {...cepMaskedInputProps}
+          />
           {isLoadingCep && <ActivityIndicator />}
         </View>
 
@@ -378,10 +497,10 @@ const SignIn = () => {
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Logradouro"
-                onChange={onChange}
-                onBlur={onBlur}
                 value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                label="Logradouro"
               />
             )}
             name="street"
@@ -397,7 +516,7 @@ const SignIn = () => {
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
                 label="Número"
-                onChange={onChange}
+                onChangeText={onChange}
                 onBlur={onBlur}
                 value={value}
                 keyboardType="number-pad"
@@ -416,34 +535,12 @@ const SignIn = () => {
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
                 label="Bairro"
-                onChange={onChange}
+                onChangeText={onChange}
                 onBlur={onBlur}
                 value={value}
               />
             )}
             name="neighborhood"
-          />
-        </View>
-
-        <View>
-          <ModalDropdown
-            style={styles.dropdown}
-            textStyle={styles.dropdown_text}
-            dropdownStyle={styles.dropdown_dropdown}
-            options={statesAcronyms}
-            renderButtonText={(rowData: any) =>
-              dropdownRenderButtonText(rowData)
-            }
-            renderRow={(rowData: any, rowID: any, highlighted: any) =>
-              dropdownRenderRow(rowData, rowID, highlighted)
-            }
-            renderSeparator={(
-              sectionID: any,
-              rowID: any,
-              adjacentRowHighlighted: any
-            ) =>
-              dropdownRenderSeparator(sectionID, rowID, adjacentRowHighlighted)
-            }
           />
         </View>
 
@@ -454,27 +551,97 @@ const SignIn = () => {
               required: true,
             }}
             render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                label="Cidade"
-                onChange={onChange}
+              <Picker
+                selectedValue={value}
+                onValueChange={(itemValue, itemIndex) => onChange(itemValue)}
                 onBlur={onBlur}
-                value={value}
-              />
+                style={{
+                  backgroundColor: appTheme.colors.primaryContainer,
+                  color: !!getValues('state')
+                    ? appTheme.colors.primary
+                    : appTheme.colors.onSurface,
+                }}
+              >
+                <Picker.Item label="Estado" value="" />
+                {statesAcronyms.map((state) => {
+                  return (
+                    <Picker.Item
+                      label={state.state}
+                      value={state.acronym}
+                      key={state.acronym}
+                    />
+                  );
+                })}
+              </Picker>
+            )}
+            name="state"
+          />
+        </View>
+
+        <View>
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Picker
+                selectedValue={value}
+                onValueChange={(itemValue, itemIndex) => onChange(itemValue)}
+                onBlur={onBlur}
+                style={{
+                  backgroundColor: appTheme.colors.primaryContainer,
+                  color: !!getValues('city')
+                    ? appTheme.colors.primary
+                    : appTheme.colors.onSurface,
+                }}
+              >
+                <Picker.Item label="Cidade" value="" />
+                {!!getValues('state') &&
+                  citiesItems.map((city) => {
+                    return <Picker.Item label={city} value={city} key={city} />;
+                  })}
+              </Picker>
             )}
             name="city"
           />
         </View>
 
+        <Text className="text-white text-xl font-medium">
+          Escolha seu avatar
+        </Text>
+
+        <SafeAreaView style={{ flex: 1 }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+            }}
+          >
+            <Carousel
+              layout="default"
+              data={figures}
+              renderItem={carouselItem}
+              sliderWidth={160}
+              itemWidth={160}
+              onSnapToItem={(value) => {
+                changeAvatarImage(value);
+              }}
+            />
+          </View>
+        </SafeAreaView>
+
         <Button
-          className="w-80"
+          className="w-screen max-w-full"
           mode="outlined"
           loading={isLoading}
-          onPress={handleSubmit(createUser)}
+          onPress={isLoading ? handleSubmit(createUser) : () => {}}
         >
           {!isLoading && 'CRIAR'}
         </Button>
+
         <Link to={{ screen: 'Login' }}>
-          <Button className="w-80" mode="outlined">
+          <Button mode="outlined" className="w-full">
             VOLTAR
           </Button>
         </Link>
@@ -483,52 +650,5 @@ const SignIn = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  dropdown: {
-    alignSelf: 'flex-end',
-    width: 150,
-    marginTop: 32,
-    right: 8,
-    borderWidth: 0,
-    borderRadius: 3,
-    backgroundColor: 'cornflowerblue',
-  },
-  dropdown_text: {
-    marginVertical: 10,
-    marginHorizontal: 6,
-    fontSize: 18,
-    color: 'white',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-  },
-  dropdown_dropdown: {
-    width: 150,
-    height: 300,
-    borderColor: 'cornflowerblue',
-    borderWidth: 2,
-    borderRadius: 3,
-  },
-  dropdown_row: {
-    flexDirection: 'row',
-    height: 40,
-    alignItems: 'center',
-  },
-  dropdown_image: {
-    marginLeft: 4,
-    width: 30,
-    height: 30,
-  },
-  dropdown_row_text: {
-    marginHorizontal: 4,
-    fontSize: 16,
-    color: 'navy',
-    textAlignVertical: 'center',
-  },
-  dropdown_separator: {
-    height: 1,
-    backgroundColor: 'cornflowerblue',
-  },
-});
 
 export default SignIn;
