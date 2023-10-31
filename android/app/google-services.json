@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "653998272131",
+    "project_id": "doe-mais-277a5",
+    "storage_bucket": "doe-mais-277a5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:653998272131:android:36bbbc8c956fe68b9835b6",
+        "android_client_info": {
+          "package_name": "com.soaresgus.doemais"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdIDPiVd9syKy5TCi3DXDyobX9gWzOjCc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

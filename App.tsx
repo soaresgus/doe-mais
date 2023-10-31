@@ -1,9 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { useFonts, Roboto_400Regular } from '@expo-google-fonts/roboto';
 import * as SplashScreen from 'expo-splash-screen';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 
 import {
   PaperProvider,
@@ -18,6 +19,9 @@ import { registerRootComponent } from 'expo';
 import ForgotPassword from './src/routes/ForgotPassword';
 import Home from './src/routes/Home';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { UserProvider } from './src/context/User';
+import { useUser } from './src/context/User/useUser';
+import { User } from './src/context/User/types';
 SplashScreen.preventAutoHideAsync();
 
 export const theme = {
@@ -71,7 +75,20 @@ export default function App() {
     Roboto_400Regular,
   });
 
+  const { user, setFirebaseUser, isLoading } = useUser();
+
   const Stack = createStackNavigator();
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged((response) => {
+      setFirebaseUser({
+        displayName: response?.displayName!,
+        email: response?.email!,
+      });
+    });
+
+    return subscriber;
+  }, []);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -88,26 +105,38 @@ export default function App() {
   });
 
   return (
-    <SafeAreaProvider>
-      <PaperProvider theme={theme}>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.container}
-          onLayout={onLayoutRootView}>
-          <NavigationContainer theme={LightTheme}>
-            <Stack.Navigator
-              screenOptions={{
-                headerShown: false,
-              }}>
-              <Stack.Screen name="Home" component={Home} />
-              <Stack.Screen name="Login" component={Login} />
-              <Stack.Screen name="SignIn" component={SignIn} />
-              <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-            </Stack.Navigator>
-          </NavigationContainer>
-          <StatusBar style="light" translucent backgroundColor="#200c10" />
-        </KeyboardAwareScrollView>
-      </PaperProvider>
-    </SafeAreaProvider>
+    <UserProvider>
+      <SafeAreaProvider>
+        <PaperProvider theme={theme}>
+          <KeyboardAwareScrollView
+            contentContainerStyle={styles.container}
+            onLayout={onLayoutRootView}>
+            <NavigationContainer theme={LightTheme}>
+              <Stack.Navigator
+                screenOptions={{
+                  headerShown: false,
+                }}>
+                {user ? (
+                  <>
+                    <Stack.Screen name="Home" component={Home} />
+                  </>
+                ) : (
+                  <>
+                    <Stack.Screen name="Login" component={Login} />
+                    <Stack.Screen name="SignIn" component={SignIn} />
+                    <Stack.Screen
+                      name="ForgotPassword"
+                      component={ForgotPassword}
+                    />
+                  </>
+                )}
+              </Stack.Navigator>
+            </NavigationContainer>
+            <StatusBar style="light" translucent backgroundColor="#200c10" />
+          </KeyboardAwareScrollView>
+        </PaperProvider>
+      </SafeAreaProvider>
+    </UserProvider>
   );
 }
 
