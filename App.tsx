@@ -16,11 +16,14 @@ import Login from './src/routes/Login';
 import SignIn from './src/routes/SignIn';
 import { registerRootComponent } from 'expo';
 import ForgotPassword from './src/routes/ForgotPassword';
+import Home from './src/routes/Home';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 SplashScreen.preventAutoHideAsync();
 
 export const theme = {
   colors: {
     primary: 'rgb(186, 26, 32)',
+    darkPrimary: 'rgb(32, 12, 16)',
     secondary: 'rgb(156, 65, 66)',
     tertiary: 'rgb(0, 109, 56)',
     onPrimary: 'rgb(255, 255, 255)',
@@ -85,25 +88,26 @@ export default function App() {
   });
 
   return (
-    <PaperProvider theme={theme}>
-      <KeyboardAwareScrollView
-        contentContainerStyle={styles.container}
-        onLayout={onLayoutRootView}
-      >
-        <NavigationContainer theme={LightTheme}>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="SignIn" component={SignIn} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-          </Stack.Navigator>
-        </NavigationContainer>
-        <StatusBar style="light" translucent backgroundColor="#200c10" />
-      </KeyboardAwareScrollView>
-    </PaperProvider>
+    <SafeAreaProvider>
+      <PaperProvider theme={theme}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.container}
+          onLayout={onLayoutRootView}>
+          <NavigationContainer theme={LightTheme}>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+              }}>
+              <Stack.Screen name="Home" component={Home} />
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="SignIn" component={SignIn} />
+              <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+            </Stack.Navigator>
+          </NavigationContainer>
+          <StatusBar style="light" translucent backgroundColor="#200c10" />
+        </KeyboardAwareScrollView>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 }
 

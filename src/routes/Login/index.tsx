@@ -49,9 +49,8 @@ const Login = () => {
           paddingBottom: 40,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#200c10',
-        }}
-      >
+          backgroundColor: appTheme.colors.darkPrimary,
+        }}>
         <Image source={logoSrc} className="w-80 h-40" resizeMode="contain" />
         <View className="flex gap-4">
           <View>
@@ -108,8 +107,7 @@ const Login = () => {
             className="w-80"
             mode="outlined"
             loading={isLoading}
-            onPress={isLoading ? () => {} : handleSubmit(login)}
-          >
+            onPress={isLoading ? () => {} : handleSubmit(login)}>
             {!isLoading && 'ENTRAR'}
           </Button>
 

@@ -32,6 +32,8 @@ import cep from 'cep-promise';
 import { useMaskedInputProps } from 'react-native-mask-input';
 import states from '../../models/states.json';
 import Carousel from 'react-native-snap-carousel';
+import * as FileSystem from 'expo-file-system';
+import { Asset } from 'expo-asset';
 
 import figura1 from '../../../assets/figures/person-1.png';
 import figura2 from '../../../assets/figures/person-2.png';
@@ -100,7 +102,7 @@ const SignIn = () => {
 
   const [cepState, setCepState] = useState('');
   const [citiesItems, setCitiesItems] = useState<string[]>([]);
-  const [image, setImage] = useState();
+  const [image, setImage] = useState<string>('');
 
   const appTheme = useTheme();
 
@@ -139,8 +141,6 @@ const SignIn = () => {
   const createUser = (data: any) => {
     console.log(data);
   };
-
-  const width = Dimensions.get('window').width;
 
   const figures = [
     {
@@ -225,10 +225,30 @@ const SignIn = () => {
     },
   ];
 
-  const changeAvatarImage = (index: number) => {
-    const figurePath = figures[index].src;
+  const changeAvatarImage = async (index: number) => {
+    const figurePath = figures[index].src
+      .replace('../../../', '')
+      .replace('./', '');
 
-    console.log(figurePath.replace('../../../assets/figures', ''));
+    const [{ localUri }] = await Asset.loadAsync(figures[index].figura);
+
+    try {
+      const fileInfo = await FileSystem.getInfoAsync(localUri);
+
+      if (fileInfo.exists) {
+        const base64String = await FileSystem.readAsStringAsync(localUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        const base64 = `data:image/png;base64,${base64String}`;
+
+        setImage(base64);
+      } else {
+        console.error('Arquivo da imagem não encontrado.');
+      }
+    } catch (error) {
+      console.error('Erro ao ler o arquivo da imagem:', error);
+    }
   };
 
   const carouselItem = ({ item, index }: { item: any; index: number }) => {
@@ -259,6 +279,10 @@ const SignIn = () => {
     return () => subscription.unsubscribe();
   }, [watch]);
 
+  useEffect(() => {
+    changeAvatarImage(0);
+  }, []);
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -267,9 +291,8 @@ const SignIn = () => {
         paddingBottom: 120,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#200c10',
-      }}
-    >
+        backgroundColor: appTheme.colors.darkPrimary,
+      }}>
       <Image source={logoSrc} className="w-80 h-40" resizeMode="contain" />
       <View className="flex gap-4 px-8">
         <View>
@@ -560,8 +583,7 @@ const SignIn = () => {
                   color: !!getValues('state')
                     ? appTheme.colors.primary
                     : appTheme.colors.onSurface,
-                }}
-              >
+                }}>
                 <Picker.Item label="Estado" value="" />
                 {statesAcronyms.map((state) => {
                   return (
@@ -594,8 +616,7 @@ const SignIn = () => {
                   color: !!getValues('city')
                     ? appTheme.colors.primary
                     : appTheme.colors.onSurface,
-                }}
-              >
+                }}>
                 <Picker.Item label="Cidade" value="" />
                 {!!getValues('state') &&
                   citiesItems.map((city) => {
@@ -616,8 +637,7 @@ const SignIn = () => {
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
-            }}
-          >
+            }}>
             <Carousel
               layout="default"
               data={figures}
@@ -635,8 +655,7 @@ const SignIn = () => {
           className="w-screen max-w-full"
           mode="outlined"
           loading={isLoading}
-          onPress={isLoading ? handleSubmit(createUser) : () => {}}
-        >
+          onPress={isLoading ? handleSubmit(createUser) : () => {}}>
           {!isLoading && 'CRIAR'}
         </Button>
 
