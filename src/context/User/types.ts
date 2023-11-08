@@ -2,17 +2,14 @@ import { ReactNode } from "react";
 import { BloodTypes } from "../../types/BloodTypes";
 
 export interface User {
+    id: string;
     fullName: string;
     email: string;
     bloodType: BloodTypes;
     userType: 'doador' | 'necessita',
-    zipCode: string;
-    addressStreet: string;
-    addressNeighborhood: string;
-    addressNumber: string;
-    addressCity: string;
-    addressState: string;
+    bloodCenter: string;
     avatarBase64: string;
+    createdAt: Date
 }
 
 export interface FirebaseUser {
@@ -26,8 +23,9 @@ export interface UserContext {
     isLoading: boolean;
     setUser: (user: User) => void;
     setFirebaseUser: (user: FirebaseUser) => void;
-    login: (email: string, password: string) => void;
+    login: (email: string, password: string) => Promise<void>;
     logout: () => void;
+    createUser: (user: User, password: string) => Promise<void>;
 }
 
 export interface UserProvider {

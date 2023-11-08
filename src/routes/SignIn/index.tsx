@@ -27,7 +27,7 @@ import { Radio } from '../../components/Radio';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { string, z } from 'zod';
-import { Link } from '@react-navigation/native';
+import { Link, useNavigation, useRoute } from '@react-navigation/native';
 import cep from 'cep-promise';
 import { useMaskedInputProps } from 'react-native-mask-input';
 import states from '../../models/states.json';
@@ -51,13 +51,14 @@ import figura13 from '../../../assets/figures/person-13.png';
 import figura14 from '../../../assets/figures/person-14.png';
 import figura15 from '../../../assets/figures/person-15.png';
 import figura16 from './';
+import { useUser } from '../../context/User/useUser';
+import { User } from '../../context/User/types';
 
 const statesAcronyms = states.estados.map((item) => {
   return { acronym: item.sigla, state: item.nome, city: item.cidades };
 });
 
 const SignIn = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCep, setIsLoadingCep] = useState(false);
 
   const createUserFormSchema = z.object({
@@ -71,10 +72,7 @@ const SignIn = () => {
       .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
       .default('A+'),
     userType: z.enum(['doador', 'necessita']).default('doador'),
-    street: z.string(),
-    neighborhood: z.string(),
-    city: z.string(),
-    number: z.number(),
+    bloodCenter: z.string().min(1, 'Campo obrigatório'),
   });
 
   const {
@@ -92,54 +90,32 @@ const SignIn = () => {
       email: '',
       bloodType: 'A+',
       userType: 'doador',
-      street: '',
-      neighborhood: '',
-      city: '',
-      number: '',
-      state: '',
+      bloodCenter: '',
     },
   });
 
-  const [cepState, setCepState] = useState('');
-  const [citiesItems, setCitiesItems] = useState<string[]>([]);
   const [image, setImage] = useState<string>('');
+  const user = useUser();
 
   const appTheme = useTheme();
-
-  const fetchCep = async (cepValue: string) => {
-    setIsLoadingCep(true);
-    const result = await cep(cepValue);
-
-    setValue('street', result.street);
-    setValue('city', result.city);
-    setValue('state', result.state);
-    setValue('neighborhood', result.neighborhood);
-
-    setIsLoadingCep(false);
-  };
-
-  const onCepInputChanged = async (cepValue: string) => {
-    setCepState(cepValue);
-    if (cepValue.length >= 9) {
-      await fetchCep(cepValue);
-      Keyboard.dismiss();
-    }
-  };
-
-  const cepMask = [/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/];
-  const cepMaskedInputProps = useMaskedInputProps({
-    value: cepState,
-    onChangeText: onCepInputChanged,
-    mask: cepMask,
-  });
+  const navigation = useNavigation();
 
   const dropdownRenderButtonText = (rowData: any) => {
     const { name, age } = rowData;
     return `${name} - ${age}`;
   };
 
-  const createUser = (data: any) => {
-    console.log(data);
+  const createUser = async (data: any) => {
+    const userData = {
+      avatarBase64: image || '',
+      bloodType: data.bloodType || '',
+      email: data.email || '',
+      fullName: data.name || '',
+      userType: data.userType || 'doador',
+      bloodCenter: data.bloodCenter || '',
+    } as User;
+    await user.createUser(userData, data.password);
+    navigation.navigate('Login');
   };
 
   const figures = [
@@ -262,22 +238,6 @@ const SignIn = () => {
       </View>
     );
   };
-
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      if (name === 'state') {
-        const stateValue = value.state;
-        if (stateValue) {
-          const cities = statesAcronyms.filter(
-            (item) => item.acronym === stateValue
-          )[0].city;
-          setCitiesItems(cities);
-          return;
-        }
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
 
   useEffect(() => {
     changeAvatarImage(0);
@@ -502,16 +462,6 @@ const SignIn = () => {
           />
         </View>
 
-        <View className="flex-row mr-8 gap-4 items-center justify-center">
-          <Input
-            label="CEP"
-            extendedClasses="w-60"
-            keyboardType="numeric"
-            {...cepMaskedInputProps}
-          />
-          {isLoadingCep && <ActivityIndicator />}
-        </View>
-
         <View>
           <Controller
             control={control}
@@ -523,109 +473,16 @@ const SignIn = () => {
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                label="Logradouro"
+                label="Hemocentro"
               />
             )}
-            name="street"
+            name="bloodCenter"
           />
-        </View>
-
-        <View>
-          <Controller
-            control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                label="Número"
-                onChangeText={onChange}
-                onBlur={onBlur}
-                value={value}
-                keyboardType="number-pad"
-              />
-            )}
-            name="number"
-          />
-        </View>
-
-        <View>
-          <Controller
-            control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                label="Bairro"
-                onChangeText={onChange}
-                onBlur={onBlur}
-                value={value}
-              />
-            )}
-            name="neighborhood"
-          />
-        </View>
-
-        <View>
-          <Controller
-            control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Picker
-                selectedValue={value}
-                onValueChange={(itemValue, itemIndex) => onChange(itemValue)}
-                onBlur={onBlur}
-                style={{
-                  backgroundColor: appTheme.colors.primaryContainer,
-                  color: !!getValues('state')
-                    ? appTheme.colors.primary
-                    : appTheme.colors.onSurface,
-                }}>
-                <Picker.Item label="Estado" value="" />
-                {statesAcronyms.map((state) => {
-                  return (
-                    <Picker.Item
-                      label={state.state}
-                      value={state.acronym}
-                      key={state.acronym}
-                    />
-                  );
-                })}
-              </Picker>
-            )}
-            name="state"
-          />
-        </View>
-
-        <View>
-          <Controller
-            control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Picker
-                selectedValue={value}
-                onValueChange={(itemValue, itemIndex) => onChange(itemValue)}
-                onBlur={onBlur}
-                style={{
-                  backgroundColor: appTheme.colors.primaryContainer,
-                  color: !!getValues('city')
-                    ? appTheme.colors.primary
-                    : appTheme.colors.onSurface,
-                }}>
-                <Picker.Item label="Cidade" value="" />
-                {!!getValues('state') &&
-                  citiesItems.map((city) => {
-                    return <Picker.Item label={city} value={city} key={city} />;
-                  })}
-              </Picker>
-            )}
-            name="city"
-          />
+          {errors.bloodCenter && (
+            <Text className="text-[16px] text-red-500">
+              {errors.bloodCenter?.message}
+            </Text>
+          )}
         </View>
 
         <Text className="text-white text-xl font-medium">
@@ -652,11 +509,11 @@ const SignIn = () => {
         </SafeAreaView>
 
         <Button
-          className="w-screen max-w-full"
+          className="w-80"
           mode="outlined"
-          loading={isLoading}
-          onPress={isLoading ? handleSubmit(createUser) : () => {}}>
-          {!isLoading && 'CRIAR'}
+          loading={user.isLoading}
+          onPress={user.isLoading ? () => {} : handleSubmit(createUser)}>
+          {!user.isLoading && 'CRIAR'}
         </Button>
 
         <Link to={{ screen: 'Login' }}>

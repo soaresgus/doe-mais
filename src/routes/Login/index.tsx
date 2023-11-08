@@ -4,13 +4,14 @@ import logoSrc from '../../../assets/logo.png';
 
 import { Button, useTheme } from 'react-native-paper';
 import { Input } from '../../components/Input';
-import { Link } from '@react-navigation/native';
+import { Link, useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useUser } from '../../context/User/useUser';
 
 const Login = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const user = useUser();
 
   const appTheme = useTheme();
 
@@ -34,9 +35,11 @@ const Login = () => {
     resolver: zodResolver(loginFormSchema),
   });
 
-  const login = (data: any) => {
-    console.log(data);
-    setIsLoading(true);
+  const navigation = useNavigation();
+
+  const login = async (data: any) => {
+    await user.login(data.email, data.password);
+    navigation.navigate('Home');
   };
 
   return (
@@ -106,9 +109,9 @@ const Login = () => {
           <Button
             className="w-80"
             mode="outlined"
-            loading={isLoading}
-            onPress={isLoading ? () => {} : handleSubmit(login)}>
-            {!isLoading && 'ENTRAR'}
+            loading={user.isLoading}
+            onPress={user.isLoading ? () => {} : handleSubmit(login)}>
+            {!user.isLoading && 'ENTRAR'}
           </Button>
 
           <Link to={{ screen: 'ForgotPassword' }}>

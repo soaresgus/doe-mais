@@ -22,6 +22,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { UserProvider } from './src/context/User';
 import { useUser } from './src/context/User/useUser';
 import { User } from './src/context/User/types';
+import ComingSoon from './src/routes/ComingSoon';
 SplashScreen.preventAutoHideAsync();
 
 export const theme = {
@@ -116,20 +117,14 @@ export default function App() {
                 screenOptions={{
                   headerShown: false,
                 }}>
-                {user ? (
-                  <>
-                    <Stack.Screen name="Home" component={Home} />
-                  </>
-                ) : (
-                  <>
-                    <Stack.Screen name="Login" component={Login} />
-                    <Stack.Screen name="SignIn" component={SignIn} />
-                    <Stack.Screen
-                      name="ForgotPassword"
-                      component={ForgotPassword}
-                    />
-                  </>
-                )}
+                <Stack.Screen name="Login" component={Login} />
+                <Stack.Screen name="SignIn" component={SignIn} />
+                <Stack.Screen
+                  name="ForgotPassword"
+                  component={ForgotPassword}
+                />
+                <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="ComingSoon" component={ComingSoon} />
               </Stack.Navigator>
             </NavigationContainer>
             <StatusBar style="light" translucent backgroundColor="#200c10" />
