@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Linking, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Button, Icon, useTheme } from 'react-native-paper';
 
@@ -12,6 +12,22 @@ export function Navbar() {
   const changeScreen = (screenName: string) => {
     navigation.navigate(screenName);
   };
+
+  const openNavigator = async (url: string) => {
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+
+      if (canOpen) {
+        await Linking.openURL(url);
+      } else {
+        console.error('Não foi possível abrir a URL.');
+      }
+    } catch (erro) {
+      console.error('Ocorreu um erro ao abrir a URL: ', erro);
+    }
+  };
+
+  const bloodCentersUrl = 'https://www.prosangue.sp.gov.br/hemocentros/';
 
   return (
     <View
@@ -28,37 +44,25 @@ export function Navbar() {
       <TouchableOpacity
         activeOpacity={0.8}
         className="w-16 h-16 items-center"
-        onPress={() => changeScreen('ComingSoon')}>
+        onPress={() => changeScreen('Donate')}>
+        <Icon source="water-plus" size={36} color="#fff" />
+        <Text className="text-sm text-white font-medium">Doar</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        activeOpacity={0.8}
+        className="w-16 h-16 items-center"
+        onPress={() => changeScreen('Ranking')}>
         <Icon source="finance" size={36} color="#fff" />
         <Text className="text-sm text-white font-medium">Ranking</Text>
       </TouchableOpacity>
 
-      <View
-        className="w-20 h-20 rounded-full mb-12"
-        style={{ backgroundColor: appTheme.colors.darkPrimary }}
-        onPress={() => changeScreen('Donate')}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="w-20 h-20 pt-2 items-center">
-          <Icon source="water-plus" size={48} color="#fff" />
-          <Text className="text-lg text-white font-medium">Doar</Text>
-        </TouchableOpacity>
-      </View>
-
       <TouchableOpacity
         activeOpacity={0.8}
         className="w-16 h-16 items-center"
-        onPress={() => changeScreen('Posts')}>
+        onPress={() => openNavigator(bloodCentersUrl)}>
         <Icon source="domain" size={36} color="#fff" />
         <Text className="text-sm text-white font-medium">Postos</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        activeOpacity={0.8}
-        className="w-16 h-16 items-center"
-        onPress={() => changeScreen('ComingSoon')}>
-        <Icon source="account" size={36} color="#fff" />
-        <Text className="text-sm text-white font-medium">Perfil</Text>
       </TouchableOpacity>
     </View>
   );

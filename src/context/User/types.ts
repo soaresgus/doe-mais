@@ -9,7 +9,9 @@ export interface User {
     userType: 'doador' | 'necessita',
     bloodCenter: string;
     avatarBase64: string;
-    createdAt: Date
+    createdAt: Date;
+    points?: number;
+    lastDonate?: Date;
 }
 
 export interface FirebaseUser {

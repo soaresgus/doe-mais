@@ -23,6 +23,10 @@ import { UserProvider } from './src/context/User';
 import { useUser } from './src/context/User/useUser';
 import { User } from './src/context/User/types';
 import ComingSoon from './src/routes/ComingSoon';
+import Donate from './src/routes/Donate';
+import ConfirmDonate from './src/routes/Donate/ConfirmDonate';
+import UnableToDonate from './src/routes/Donate/UnableToDonate';
+import Ranking from './src/routes/Ranking';
 SplashScreen.preventAutoHideAsync();
 
 export const theme = {
@@ -125,6 +129,13 @@ export default function App() {
                 />
                 <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="ComingSoon" component={ComingSoon} />
+                <Stack.Screen name="Donate" component={Donate} />
+                <Stack.Screen name="ConfirmDonate" component={ConfirmDonate} />
+                <Stack.Screen
+                  name="UnableToDonate"
+                  component={UnableToDonate}
+                />
+                <Stack.Screen name="Ranking" component={Ranking} />
               </Stack.Navigator>
             </NavigationContainer>
             <StatusBar style="light" translucent backgroundColor="#200c10" />

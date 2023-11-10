@@ -57,6 +57,17 @@ const Home = () => {
     getAllDonatorsUsers();
   }, []);
 
+  useEffect(() => {
+    async function setUser() {
+      const userDoc = firestore().collection('users').doc(user.user?.email);
+      const userData = (await userDoc.get()).data();
+
+      user.setUser(userData as User);
+    }
+
+    setUser();
+  });
+
   return (
     <SafeAreaView
       className="h-full"
@@ -70,7 +81,17 @@ const Home = () => {
           <Text
             style={{ color: appTheme.colors.primary }}
             className="font-bold text-xl">
-            0
+            {(user.user?.points || 0) / 3}
+          </Text>
+        </Surface>
+
+        <Surface elevation={4} className="p-4 rounded-lg">
+          <Text className="text-black font-bold text-2xl">Seus pontos</Text>
+
+          <Text
+            style={{ color: appTheme.colors.primary }}
+            className="font-bold text-xl">
+            {user.user?.points || 0}
           </Text>
         </Surface>
 

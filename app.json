@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "doe-mais",
-    "slug": "doe-mais",
+    "name": "DoeMais",
+    "slug": "DoeMais",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,7 +25,10 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.soaresgus.doemais",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,7 +36,18 @@
     "plugins": [
       "@react-native-firebase/app",
       "@react-native-firebase/perf",
-      "@react-native-firebase/crashlytics"
-    ]
+      "@react-native-firebase/crashlytics",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O app necessita acessar suas fotos."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "12f05e1d-cc4a-4a32-9a41-479c5bc3f7ec"
+      }
+    }
   }
 }
